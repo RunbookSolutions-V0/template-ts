@@ -32,7 +32,7 @@ jobs:
         id: comment-body
         run: |
           npm run test 2>&1 | tee /tmp/output.txt
-          cat /tmp/output.txt >> $GITHUB_OUTPUT
+          echo "$(cat /tmp/output.txt)" >> $GITHUB_OUTPUT
   
       - uses: actions/github-script@v6
         with:
@@ -78,7 +78,7 @@ jobs:
         id: comment-body
         run: |
           cdk diff 2>&1 | tee /tmp/output.txt
-          cat /tmp/output.txt >> $GITHUB_OUTPUT
+          echo "$(cat /tmp/output.txt)" >> $GITHUB_OUTPUT
 
       - uses: actions/github-script@v6
         with:
