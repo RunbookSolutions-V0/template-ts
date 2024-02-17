@@ -32,7 +32,7 @@ jobs:
         id: comment-body
         run: |
           echo 'BODY_COMMENT<<EOF' >> $GITHUB_OUTPUT
-          npm run test 2>&1 >> $GITHUB_OUTPUT
+          npm run test 2>&1 | tee >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
   
       - uses: actions/github-script@v6
