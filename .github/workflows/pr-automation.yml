@@ -21,6 +21,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
+      
+      - name: Configure Github NPM Registry
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
 
       - name: Install Dependencies
         run: npm ci
@@ -43,6 +46,8 @@ jobs:
   StackDifferences:
     name: Get Stack Difference
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
