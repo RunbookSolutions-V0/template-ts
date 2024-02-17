@@ -29,18 +29,19 @@ jobs:
         run: npm ci
 
       - name: Run Tests and capture output
-        id: test
-        run: npm run test 2>&1 | tee /tmp/test_output.txt
+        id: comment-body
+        run: |
+          npm run test 2>&1 | tee /tmp/output.txt
+          cat /tmp/output.txt >> $GITHUB_OUTPUT
   
       - uses: actions/github-script@v6
         with:
           script: |
-            const output = fs.readFileSync('/tmp/test_output.txt', 'utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: output
+              body: '${{ steps.comment-body.outputs }}'
             })
 
   StackDifferences:
@@ -74,15 +75,17 @@ jobs:
         run: npm ci
 
       - name: Calculate Differences
-        run: cdk diff  2>&1 | tee /tmp/test_output.txt
+        id: comment-body
+        run: |
+          cdk diff 2>&1 | tee /tmp/output.txt
+          cat /tmp/output.txt >> $GITHUB_OUTPUT
 
       - uses: actions/github-script@v6
         with:
           script: |
-            const output = fs.readFileSync('/tmp/test_output.txt', 'utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: output
+              body: '${{ steps.comment-body.outputs }}'
             })
