@@ -7,14 +7,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate version-bump[bot] Token
-        id: app-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.VERSION_BUMP_KEY }}
+      # - name: Generate version-bump[bot] Token
+      #   id: app-token
+      #   uses: actions/create-github-app-token@v1
+      #   with:
+      #     app-id: ${{ vars.APP_ID }}
+      #     private-key: ${{ secrets.VERSION_BUMP_KEY }}
       
+      # - uses: google-github-actions/release-please-action@v4
+      #   with:
+      #     token: ${{ steps.app-token.outputs.token }}
+      #     release-type: node
+
       - uses: google-github-actions/release-please-action@v4
         with:
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node

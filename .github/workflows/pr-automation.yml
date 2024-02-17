@@ -47,49 +47,51 @@ jobs:
               `
             })
 
-  # StackDifferences:
-  #   name: Get Stack Difference
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     id-token: write
-  #   steps:
-  #     - name: Checkout Source
-  #       uses: actions/checkout@v4
+  StackDifferences:
+    name: Get Stack Difference
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
 
-  #     - name: Use Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '20.x'
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
-  #         aws-region: 'us-east-1'
-  #         role-session-name: "GitHubActions-DeployLayerStack"
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_DIFF_ROLE }}
+          aws-region: 'us-east-1'
+          role-session-name: "GitHubActions-DeployLayerStack"
   
-  #     - name: Configure Github NPM Registry
-  #       run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
+      - name: Configure Github NPM Registry
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
       
-  #     # Install CDK and our Dependencies
-  #     - name: Install CDK
-  #       run: npm install -g aws-cdk
+      # Install CDK and our Dependencies
+      - name: Install CDK
+        run: npm install -g aws-cdk
       
-  #     - name: Install Dependencies
-  #       run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-  #     - name: Calculate Differences
-  #       id: comment-body
-  #       run: >-
-  #         echo 'BODY_COMMENT=<<EOF' >> $GITHUB_OUTPUT
-  #         cdk diff 2>&1 >> $GITHUB_OUTPUT
-  #         echo 'EOF' >> $GITHUB_OUTPUT
+      - name: Calculate Differences
+        id: comment-body
+        run: >-
+          echo 'BODY_COMMENT=<<EOF' >> $GITHUB_OUTPUT
+          cdk diff 2>&1 | tee >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
 
-  #     - uses: actions/github-script@v6
-  #       with:
-  #         script: |
-  #           github.rest.issues.createComment({
-  #             issue_number: context.issue.number,
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             body: '${{ steps.comment-body.outputs.BODY_COMMENT }}'
-  #           })
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `# Stack Difference
+                ${{ steps.comment-body.outputs.BODY_COMMENT }}
+              `
+            })
