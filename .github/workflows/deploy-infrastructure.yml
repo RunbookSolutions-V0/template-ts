@@ -1,0 +1,49 @@
+name: Deploy Infrastructure
+
+permissions:
+ id-token: write  # Allow github to gain openID
+ contents: read  # Permits your action to read this repo.
+ packages: read   # Permit us to download private NPM packages from github's repository
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  DeployInfrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
+          aws-region: 'us-east-1'
+          role-session-name: "GitHubActions-DeployLayerStack"
+
+      - name: Configure Github NPM Registry
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
+      
+      # Install CDK and our Dependencies
+      - name: Install CDK
+        run: npm install -g aws-cdk
+      
+      - name: Install Dependencies
+        run: npm ci
+
+      # GitHubTrust
+      - name: Deploy Microservice (via CDK)
+        run: cdk deploy --all --require-approval never
+
+      # Stack Example
+      #- name: Deploy Infrastructure-Route53-Stack (via CDK)
+      #  run: cdk deploy InfrastructureRoute53Stack --require-approval never --paramater DomainName=runbook.solutions
