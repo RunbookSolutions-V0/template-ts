@@ -30,9 +30,10 @@ jobs:
 
       - name: Run Tests and capture output
         id: comment-body
-        run: |
-          npm run test 2>&1 | tee /tmp/output.txt
-          cat /tmp/output.txt >> $GITHUB_OUTPUT
+        run: >-
+          echo "::set-output name=BODY_COMMENT::$(
+            npm run test
+          )""
   
       - uses: actions/github-script@v6
         with:
@@ -41,7 +42,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '${{ steps.comment-body.outputs }}'
+              body: '${{ steps.comment-body.outputs.BODY_COMMENT }}'
             })
 
   StackDifferences:
@@ -76,9 +77,10 @@ jobs:
 
       - name: Calculate Differences
         id: comment-body
-        run: |
-          cdk diff 2>&1 | tee /tmp/output.txt
-          echo "$(cat /tmp/output.txt)" >> $GITHUB_OUTPUT
+        run: >-
+          echo "::set-output name=BODY_COMMENT::$(
+            cdk diff
+          )"
 
       - uses: actions/github-script@v6
         with:
@@ -87,5 +89,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '${{ steps.comment-body.outputs }}'
+              body: '${{ steps.comment-body.outputs.BODY_COMMENT }}'
             })
