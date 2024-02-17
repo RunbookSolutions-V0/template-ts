@@ -32,7 +32,7 @@ jobs:
         id: comment-body
         run: |
           npm run test 2>&1 | tee /tmp/output.txt
-          echo "$(cat /tmp/output.txt)" >> $GITHUB_OUTPUT
+          cat /tmp/output.txt >> $GITHUB_OUTPUT
   
       - uses: actions/github-script@v6
         with:
