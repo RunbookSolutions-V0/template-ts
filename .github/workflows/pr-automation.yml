@@ -30,7 +30,10 @@ jobs:
 
       - name: Run Tests and capture output
         id: comment-body
-        run: echo "BODY_COMMENT=$(npm run test)" >> $GITHUB_OUTPUT"
+        run: |
+          echo 'BODY_COMMENT=<<EOF' >> $GITHUB_OUTPUT
+          npm run test >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
   
       - uses: actions/github-script@v6
         with:
@@ -75,9 +78,9 @@ jobs:
       - name: Calculate Differences
         id: comment-body
         run: >-
-          echo "::set-output name=BODY_COMMENT::$(
-            cdk diff
-          )"
+          echo 'BODY_COMMENT=<<EOF' >> $GITHUB_OUTPUT
+          cdk diff >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
 
       - uses: actions/github-script@v6
         with:
