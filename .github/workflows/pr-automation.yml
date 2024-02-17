@@ -30,10 +30,7 @@ jobs:
 
       - name: Run Tests and capture output
         id: comment-body
-        run: >-
-          echo "::set-output name=BODY_COMMENT::$(
-            npm run test
-          )""
+        run: echo "BODY_COMMENT=$(npm run test)" >> $GITHUB_OUTPUT"
   
       - uses: actions/github-script@v6
         with:
